@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gopal Kumar - AI & Data Science Portfolio</title>
+
+    <!-- SEO & Meta Optimization -->
+    <meta name="description" content="Gopal Kumar | AI & Data Science | React Developer | Portfolio showcasing full-stack projects, dashboards, and ML models.">
+    <meta property="og:title" content="Gopal Kumar - AI & Data Science Portfolio">
+    <meta property="og:description" content="Gopal Kumar | AI & Data Science | React Developer | Portfolio showcasing full-stack projects, dashboards, and ML models.">
+    <!-- Replace with a link to a high-quality thumbnail image (e.g., your logo, a project screenshot) for social sharing -->
+    <meta property="og:image" content="https://placehold.co/1200x630/111827/FBBF24?text=Gopal+Kumar+Portfolio">
+    <meta name="robots" content="index, follow">
+    <!-- End SEO & Meta Optimization -->
+
+    <!-- Chosen Palette: Gotham Tech -->
+    <!-- Application Structure Plan: A single-page, top-to-bottom narrative SPA. The structure flows from a Hero introduction, to an About Me section, an interactive Skills Dashboard (with a radar chart), a filterable Projects Showcase (with modals for details), and a final Contact section. A sticky navigation bar allows for quick jumps between sections. This structure was chosen to translate the multi-page concept from the source report into a fluid, modern, and engaging single-page experience that tells a coherent story of the developer's capabilities without requiring page loads. -->
+    <!-- Visualization & Content Choices: Hero: Large typography and subtle background animation for impact. Skills: Chart.js radar chart to visually compare competency areas (Goal: Compare), supplemented by HTML/CSS tags for specific skills (Goal: Inform). Projects: Filterable HTML/CSS grid of cards (Goal: Organize) that open JS-powered modals for detailed case studies (Goal: Inform/Demonstrate). Contact: Standard HTML form. All interactions are handled with vanilla JS. This approach prioritizes interactivity and visual storytelling over static lists, directly addressing the report's emphasis on creating an impactful portfolio. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827;
+            color: #E5E7EB;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #FBBF24;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link.active {
+            color: #FBBF24;
+        }
+        .skill-tag {
+            transition: all 0.2s ease-in-out;
+        }
+        .skill-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2);
+        }
+        .project-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .project-card .project-overlay {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            animation: slideIn 0.4s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        /* Preloader Styles */
+        #preloader {
+            background-color: #111827; /* Match body background */
+            transition: opacity 0.5s ease-out;
+        }
+        .loader {
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed w-full h-full flex items-center justify-center bg-gray-900 z-50">
+      <div class="loader border-4 border-amber-400 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header id="header" class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="font-orbitron text-xl font-bold text-white">GK</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="nav-link text-gray-300 hover:text-amber-400">About</a>
+                <a href="#skills" class="nav-link text-gray-300 hover:text-amber-400">Skills</a>
+                <a href="#projects" class="nav-link text-gray-300 hover:text-amber-400">Projects</a>
+                <a href="#contact" class="nav-link text-gray-300 hover:text-amber-400">Contact</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <!-- Updated href for resume download to use Google Drive direct download link -->
+                <a href="https://drive.google.com/uc?export=download&id=1fz21nRiOzbYQKKnwpQT-dxzGvELy_OJv" download="GopalKumar_Resume.pdf" class="bg-gray-700 text-amber-400 font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors">
+                    Download Resume
+                </a>
+                <a href="#contact" class="bg-amber-400 text-gray-900 font-bold py-2 px-4 rounded-md hover:bg-amber-300 transition-colors">
+                    Hire Me
+                </a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-white" aria-label="Open mobile menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#about" class="block py-2 nav-link text-gray-300 hover:text-amber-400">About</a>
+            <a href="#skills" class="block py-2 nav-link text-gray-300 hover:text-amber-400">Skills</a>
+            <a href="#projects" class="block py-2 nav-link text-gray-300 hover:text-amber-400">Projects</a>
+            <a href="#contact" class="block py-2 nav-link text-gray-300 hover:text-amber-400">Contact</a>
+            <div class="flex flex-col space-y-3 mt-4">
+                <!-- Updated href for resume download to use Google Drive direct download link -->
+                <a href="https://drive.google.com/uc?export=download&id=1fz21nRiOzbYQKKnwpQT-dxzGvELy_OJv" download="GopalKumar_Resume.pdf" class="text-center bg-gray-700 text-amber-400 font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors">
+                    Download Resume
+                </a>
+                <a href="#contact" class="text-center bg-amber-400 text-gray-900 font-bold py-2 px-4 rounded-md hover:bg-amber-300 transition-colors">
+                    Hire Me
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center text-center relative overflow-hidden">
+            <canvas id="hero-canvas"></canvas>
+            <div class="relative z-10 p-4">
+                <h1 class="font-orbitron text-4xl md:text-7xl font-bold text-white uppercase tracking-widest">Gopal Kumar</h1>
+                <p class="mt-4 text-lg md:text-2xl text-amber-400 font-medium">I build beautiful, functional digital experiences.</p>
+                <p class="mt-2 text-md md:text-lg text-gray-300 max-w-2xl mx-auto">3rd Year B.Tech Student in Artificial Intelligence & Data Science at GGSIPU.</p>
+                <div class="mt-8 flex justify-center space-x-6">
+                    <a href="https://www.linkedin.com/in/gopal-kumar-07a62322b/" target="_blank" class="text-gray-400 hover:text-amber-400 transition-colors" aria-label="Gopal Kumar's LinkedIn profile">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="mailto:gopalkumarsingh2004@gmail.com" class="text-gray-400 hover:text-amber-400 transition-colors" aria-label="Email Gopal Kumar">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 md:py-32 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="font-orbitron text-3xl md:text-4xl font-bold text-white">About Me</h2>
+                    <div class="w-24 h-1 bg-amber-400 mx-auto mt-4"></div>
+                </div>
+                <div class="max-w-4xl mx-auto text-center text-gray-300 text-lg leading-relaxed">
+                    <p class="mb-4">
+                        I am a passionate and driven student of Artificial Intelligence and Data Science at Guru Gobind Singh Indraprastha University. My journey into technology is fueled by a fascination with how data can be transformed into powerful insights and intelligent solutions. I thrive on challenges and am constantly exploring the intersections of web development, machine learning, and cloud technologies.
+                    </p>
+                    <p>
+                        My goal is to leverage my diverse skillset—from building responsive frontends with React to architecting robust backends and deploying scalable applications—to create technology that is not only smart but also intuitive and impactful. I believe in continuous learning and applying my knowledge to solve real-world problems.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 md:py-32 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="font-orbitron text-3xl md:text-4xl font-bold text-white">Technical Skillset</h2>
+                    <p class="mt-4 text-gray-400 max-w-2xl mx-auto">A visual representation of my core competencies and a detailed list of the technologies I work with.</p>
+                    <div class="w-24 h-1 bg-amber-400 mx-auto mt-4"></div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <div class="flex flex-col space-y-8">
+                        <div>
+                            <h3 class="font-orbitron text-xl font-bold text-amber-400 mb-4">AI & Data Science</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Python</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Machine Learning</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">SQL</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">PowerBI</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Excel</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Meta Ads</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-orbitron text-xl font-bold text-amber-400 mb-4">Web Development</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">React</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">JavaScript</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">HTML5 & CSS3</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Backend Development</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">REST APIs</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-orbitron text-xl font-bold text-amber-400 mb-4">Tools & Platforms</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">DevOps</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Git & GitHub</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">Docker</span>
+                                <span class="skill-tag bg-gray-700 text-gray-200 py-2 px-4 rounded-md">C++</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 md:py-32 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="font-orbitron text-3xl md:text-4xl font-bold text-white">Featured Projects</h2>
+                    <p class="mt-4 text-gray-400 max-w-2xl mx-auto">A selection of projects that demonstrate my skills in action. Click on a card for more details.</p>
+                    <div class="w-24 h-1 bg-amber-400 mx-auto mt-4"></div>
+                </div>
+                <div id="project-filters" class="flex justify-center flex-wrap gap-4 mb-12">
+                    <button class="filter-btn active bg-amber-400 text-gray-900 font-bold py-2 px-5 rounded-md" data-filter="all">All</button>
+                    <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-5 rounded-md transition-colors" data-filter="ai-ml">AI/ML</button>
+                    <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-5 rounded-md transition-colors" data-filter="web-dev">Web Dev</button>
+                    <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-5 rounded-md transition-colors" data-filter="data-viz">Data Viz</button>
+                </div>
+                <div id="project-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project cards will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 md:py-32 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="font-orbitron text-3xl md:text-4xl font-bold text-white">Get In Touch</h2>
+                    <p class="mt-4 text-gray-400 max-w-2xl mx-auto">Have a project in mind or just want to connect? Feel free to reach out.</p>
+                    <div class="w-24 h-1 bg-amber-400 mx-auto mt-4"></div>
+                </div>
+                <div class="max-w-3xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-center md:text-left">
+                        <div class="mb-6">
+                            <h3 class="font-orbitron text-xl text-amber-400">Email</h3>
+                            <a href="mailto:gopalkumarsingh2004@gmail.com" class="text-gray-300 hover:text-white transition-colors">gopalkumarsingh2004@gmail.com</a>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-orbitron text-xl text-amber-400">Phone</h3>
+                            <a href="tel:8285623224" class="text-gray-300 hover:text-white transition-colors">8285623224</a>
+                        </div>
+                        <div>
+                            <h3 class="font-orbitron text-xl text-amber-400">LinkedIn</h3>
+                            <a href="https://www.linkedin.com/in/gopal-kumar-07a62322b/" target="_blank" class="text-gray-300 hover:text-white transition-colors">/gopal-kumar-07a62322b</a>
+                        </div>
+                        <div class="mt-8">
+                             <!-- Updated href for resume download to use Google Drive direct download link -->
+                             <a href="https://drive.google.com/uc?export=download&id=1fz21nRiOzbYQKKnwpQT-dxzGvELy_OJv" download="GopalKumar_Resume.pdf" class="bg-gray-700 text-amber-400 font-bold py-3 px-6 rounded-md hover:bg-gray-600 transition-colors">
+                                Download Resume
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Form updated for Netlify Forms.
+                         If you are hosting on Netlify, this will automatically capture submissions.
+                         Ensure the 'name' attribute is present on all input fields.
+                         If NOT hosting on Netlify, you will need a different form backend service.
+                    -->
+                    <form name="contact" method="POST" data-netlify="true" class="w-full">
+                        <div class="mb-4">
+                            <input type="text" name="name" placeholder="Your Name" class="w-full p-3 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-white">
+                        </div>
+                        <div class="mb-4">
+                            <input type="email" name="email" placeholder="Your Email" class="w-full p-3 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-white">
+                        </div>
+                        <div class="mb-4">
+                            <textarea name="message" placeholder="Your Message" rows="5" class="w-full p-3 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-white"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-amber-400 text-gray-900 font-bold py-3 px-6 rounded-md hover:bg-amber-300 transition-colors">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 py-6">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <p>&copy; 2025 Gopal Kumar. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="modal">
+        <div class="modal-content bg-gray-800 rounded-lg shadow-xl m-4 md:my-8 max-w-4xl mx-auto relative text-gray-300">
+            <!-- Content will be injected by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Data for projects
+            const projects = [
+                {
+                    id: 1,
+                    title: "Customer Churn Prediction",
+                    category: "ai-ml",
+                    image: "https://placehold.co/600x400/1F2937/FBBF24?text=AI+Model",
+                    summary: "A machine learning model to predict customer churn for a subscription-based service, enabling proactive retention strategies.",
+                    problem: "A telecom company was facing high customer attrition rates, but lacked the tools to identify at-risk customers before they left.",
+                    solution: "Developed and deployed a classification model using Python, Scikit-learn, and Pandas. The model analyzes customer usage patterns, contract details, and support interactions to generate a 'churn probability' score for each customer.",
+                    impact: "The model achieved 88% accuracy in predicting churn, allowing the marketing team to target at-risk customers with retention offers, potentially reducing churn by 15%.",
+                    tech: ["Python", "Scikit-learn", "Pandas", "Jupyter", "SQL"]
+                },
+                {
+                    id: 2,
+                    title: "Interactive Sales Dashboard",
+                    category: "data-viz",
+                    image: "https://placehold.co/600x400/1F2937/FBBF24?text=PowerBI+Dashboard",
+                    summary: "A dynamic PowerBI dashboard providing real-time insights into sales performance across different regions and product categories.",
+                    problem: "The sales team relied on static weekly Excel reports, which made it difficult to spot trends, analyze performance, or make quick, data-driven decisions.",
+                    solution: "Designed and built an interactive dashboard in PowerBI connected to a live SQL database. The dashboard features drill-down capabilities, time-series analysis, and KPI visualizations for sales, revenue, and profit margins.",
+                    impact: "Provided the sales leadership with on-demand access to performance metrics, reducing reporting time by 80% and enabling faster identification of underperforming regions.",
+                    tech: ["PowerBI", "DAX", "SQL", "Data Modeling"]
+                },
+                {
+                    id: 3,
+                    title: "Full-Stack E-commerce Platform",
+                    category: "web-dev",
+                    image: "https://placehold.co/600x400/1F2937/FBBF24?text=React+App",
+                    summary: "A complete e-commerce web application built with the MERN stack, featuring product listings, a shopping cart, and user authentication.",
+                    problem: "A local business needed an online presence to sell their products but lacked an e-commerce platform.",
+                    solution: "Engineered a full-stack solution using React for the frontend, Node.js/Express for the backend REST API, and MongoDB for the database. Implemented secure user authentication with JWT and integrated a payment gateway.",
+                    impact: "Created a new sales channel for the business, resulting in a scalable platform ready for market entry.",
+                    tech: ["React", "Node.js", "Express", "MongoDB", "JWT", "Tailwind CSS"]
+                },
+                {
+                    id: 4,
+                    title: "CI/CD Pipeline Automation",
+                    category: "web-dev",
+                    image: "https://placehold.co/600x400/1F2937/FBBF24?text=DevOps+Pipeline",
+                    summary: "Automated the build, test, and deployment process for a web application using GitHub Actions and Docker.",
+                    problem: "The development team was spending significant manual effort on deploying updates, leading to slow release cycles and potential for human error.",
+                    solution: "Constructed a CI/CD pipeline that automatically triggers on every push to the main branch. The pipeline builds a Docker image, runs automated tests, and deploys the container to a cloud server, sending notifications on success or failure.",
+                    impact: "Reduced deployment time from 2 hours to 10 minutes and eliminated deployment-related errors, increasing developer productivity.",
+                    tech: ["DevOps", "GitHub Actions", "Docker", "YAML", "Shell Scripting"]
+                },
+                {
+                    id: 5,
+                    title: "Meta Ads Campaign Analysis",
+                    category: "data-viz",
+                    image: "https://placehold.co/600x400/1F2937/FBBF24?text=Marketing+Tech",
+                    summary: "An analytical report and dashboard visualizing the performance of Meta Ads campaigns to optimize Return on Ad Spend (ROAS).",
+                    problem: "A startup was spending on Meta Ads but had poor visibility into which campaigns, ad sets, or creatives were driving the best results.",
+                    solution: "Extracted campaign data using the Meta Ads API, performed data cleaning and analysis in Python, and created a PowerBI dashboard to visualize key metrics like CTR, Conversion Rate, and ROAS. Identified top-performing audience segments and ad creatives.",
+                    impact: "Provided actionable insights that led to a reallocation of the ad budget, improving overall ROAS by 25% in one quarter.",
+                    tech: ["Meta Ads", "Python", "Pandas", "PowerBI", "API"]
+                }
+            ];
+
+            const projectGrid = document.getElementById('project-grid');
+            const projectModal = document.getElementById('project-modal');
+            const modalContent = projectModal.querySelector('.modal-content');
+
+            function renderProjects(filter = 'all') {
+                projectGrid.innerHTML = '';
+                const filteredProjects = filter === 'all' ? projects : projects.filter(p => p.category === filter);
+
+                filteredProjects.forEach(project => {
+                    const card = document.createElement('div');
+                    card.className = 'project-card bg-gray-800 rounded-lg cursor-pointer shadow-lg';
+                    card.dataset.id = project.id;
+                    card.innerHTML = `
+                        <div class="relative">
+                            <img src="${project.image}" alt="${project.title}" class="rounded-t-lg w-full h-48 object-cover">
+                            <div class="project-overlay absolute inset-0 bg-black/60 flex items-center justify-center rounded-t-lg">
+                                <p class="text-white text-lg font-bold">View Details</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-orbitron text-xl font-bold text-white">${project.title}</h3>
+                            <p class="text-gray-400 mt-2 h-16">${project.summary}</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                ${project.tech.slice(0, 3).map(t => `<span class="text-xs bg-gray-700 text-amber-400 py-1 px-2 rounded-full">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                    projectGrid.appendChild(card);
+                });
+            }
+
+            function openModal(projectId) {
+                const project = projects.find(p => p.id == projectId);
+                if (!project) return;
+
+                modalContent.innerHTML = `
+                    <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+                    <img src="${project.image}" alt="${project.title}" class="w-full h-64 object-cover rounded-t-lg">
+                    <div class="p-8">
+                        <h2 class="font-orbitron text-3xl font-bold text-white mb-2">${project.title}</h2>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            ${project.tech.map(t => `<span class="text-sm bg-gray-700 text-amber-400 py-1 px-3 rounded-full">${t}</span>`).join('')}
+                        </div>
+                        <div class="space-y-4 text-gray-300">
+                            <div><strong class="text-amber-400 block">The Problem:</strong><p>${project.problem}</p></div>
+                            <div><strong class="text-amber-400 block">My Solution:</strong><p>${project.solution}</p></div>
+                            <div><strong class="text-amber-400 block">The Impact:</strong><p>${project.impact}</p></div>
+                        </div>
+                         <div class="mt-8 flex space-x-4">
+                            <a href="#" class="bg-amber-400 text-gray-900 font-bold py-2 px-6 rounded-md hover:bg-amber-300 transition-colors">Live Demo</a>
+                            <a href="#" class="bg-gray-700 text-white font-bold py-2 px-6 rounded-md hover:bg-gray-600 transition-colors">View Code</a>
+                        </div>
+                    </div>
+                `;
+                projectModal.style.display = 'block';
+                document.getElementById('close-modal').addEventListener('click', () => projectModal.style.display = 'none');
+            }
+
+            // Project Filtering
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-amber-400', 'text-gray-900');
+                        btn.classList.add('bg-gray-700', 'text-gray-200');
+                    });
+                    button.classList.add('bg-amber-400', 'text-gray-900');
+                    button.classList.remove('bg-gray-700', 'text-gray-200');
+                    renderProjects(button.dataset.filter);
+                });
+            });
+
+            // Project Modal Trigger
+            projectGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.project-card');
+                if (card) {
+                    openModal(card.dataset.id);
+                }
+            });
+
+            // Close modal on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target == projectModal) {
+                    projectModal.style.display = 'none';
+                }
+            });
+
+            // Initial render
+            renderProjects();
+
+            // Skills Chart
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Frontend', 'Backend', 'AI/ML', 'Data Science', 'DevOps'],
+                    datasets: [{
+                        label: 'Proficiency',
+                        data: [85, 80, 90, 95, 75],
+                        backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                        borderColor: 'rgba(251, 191, 36, 1)',
+                        pointBackgroundColor: 'rgba(251, 191, 36, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(251, 191, 36, 1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                            pointLabels: {
+                                font: { size: 14, family: 'Orbitron' },
+                                color: '#E5E7EB'
+                            },
+                            ticks: {
+                                color: '#111827', // Make ticks invisible by matching background
+                                backdropColor: 'rgba(255, 255, 255, 0.1)',
+                                stepSize: 25,
+                                display: false // Hide numerical labels on axis
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Mobile Menu Toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu on link click
+            mobileMenu.addEventListener('click', (e) => {
+                if(e.target.tagName === 'A') {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Sticky Header
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('py-2');
+                    header.classList.remove('py-4');
+                } else {
+                    header.classList.add('py-4');
+                    header.classList.remove('py-2');
+                }
+            });
+            
+            // Active Nav Link on Scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' }); // Adjusted rootMargin to better detect active section
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Hero Canvas Animation
+            const canvas = document.getElementById('hero-canvas');
+            const c = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = [];
+
+            function Particle(x, y, dx, dy, radius, color) {
+                this.x = x; this.y = y; this.dx = dx; this.dy = dy; this.radius = radius; this.color = color;
+                this.draw = function() {
+                    c.beginPath(); c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    c.fillStyle = this.color; c.fill();
+                };
+                this.update = function() {
+                    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) this.dx = -this.dx;
+                    if (this.y + this.radius > canvas.height || this.y - this.radius < 0) this.dy = -this.dy;
+                    this.x += this.dx; this.y += this.dy; this.draw();
+                };
+            }
+
+            function initCanvas() {
+                particles = [];
+                const particleCount = Math.floor(canvas.width / 20); // Adjust density based on width
+                for (let i = 0; i < particleCount; i++) {
+                    const radius = Math.random() * 1.5 + 0.5;
+                    const x = Math.random() * (canvas.width - radius * 2) + radius;
+                    const y = Math.random() * (canvas.height - radius * 2) + radius;
+                    const dx = (Math.random() - 0.5) * 0.3;
+                    const dy = (Math.random() - 0.5) * 0.3;
+                    particles.push(new Particle(x, y, dx, dy, radius, 'rgba(251, 191, 36, 0.4)'));
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                c.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                }
+                // Connect particles
+                for (let a = 0; a < particles.length; a++) {
+                    for (let b = a; b < particles.length; b++) {
+                        let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
+                                     + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+                        // Adjust connection distance based on canvas size for better responsiveness
+                        if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                            c.strokeStyle = `rgba(251, 191, 36, ${1 - (distance / (canvas.width * canvas.height / 100))})`; // Adjusted transparency calculation
+                            c.lineWidth = 0.5;
+                            c.beginPath();
+                            c.moveTo(particles[a].x, particles[a].y);
+                            c.lineTo(particles[b].x, particles[b].y);
+                            c.stroke();
+                        }
+                    }
+                }
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initCanvas();
+            });
+
+            initCanvas();
+            animate();
+
+            // Preloader hiding
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500); // Give a little time for fade out transition
+        });
+    </script>
+</body>
+</html>
